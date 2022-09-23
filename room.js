@@ -106,8 +106,9 @@ module.exports = class room {
 
     pullOutRandomCardFromDeck() {
         let random_val = Math.floor(Math.random() * this.deck.length)
+        let card = this.deck[random_val]
         this.deck.splice(random_val, 1)
-        return this.deck[random_val]
+        return card
     }
 
     disconnect(id) {
