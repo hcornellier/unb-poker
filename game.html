@@ -200,6 +200,15 @@
             socket.emit('message', document.getElementById('userinput').value)
             document.getElementById('userinput').value = ""
         })
+        document.querySelector('#txtSearch').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                let str = document.getElementById('userinput').value
+                if (str.length > 0) {
+                    socket.emit('message', document.getElementById('userinput').value)
+                    document.getElementById('userinput').value = ""
+                }
+            }
+        });
         pokerwrap.insertAdjacentHTML('beforeend', '<div id="player_1" class="player_chair" >'
                                                 + localuser.charAt(0).toUpperCase() + '</div>'
                                                 + "<div id='p1_gold' class='goldwrap'>500</div>")
