@@ -200,7 +200,7 @@
             socket.emit('message', document.getElementById('userinput').value)
             document.getElementById('userinput').value = ""
         })
-        document.querySelector('#txtSearch').addEventListener('keypress', function (e) {
+        document.addEventListener("keyup", function(e) {
             if (e.key === 'Enter') {
                 let str = document.getElementById('userinput').value
                 if (str.length > 0) {
