@@ -1,5 +1,6 @@
 const Player = require('./player.js')
 const Card = require('./card.js')
+const Deck = require('./deck.js')
 const config = {
     screen_width,
     screen_height,
@@ -14,7 +15,7 @@ module.exports = class room {
         this.player1.turn = true
         this.player1.admin = true
         this.id = p1.room_code + p1.id
-        this.deck = this.generate_deck()
+        this.deck = new Deck();
         this.cardsOnTable = []
         this.io = io
         this.players = []
@@ -32,6 +33,7 @@ module.exports = class room {
             this.io.to(p.id).emit('config', config)
             this.io.to(p.id).emit('initialize_game', this.players)
         })
+        console.log(this.deck)
     }
 
     add_player(player) {
@@ -40,22 +42,9 @@ module.exports = class room {
         lastPlayer.nextPlayer = this.players.length - 1
     }
 
-    generate_deck() {
-        let deck = []
-        let cardtype = "Hearts"
-        for (let i = 1; i < 53; i++) {
-            let value = ((52 - i) % 13) + 1
-            deck.push(new Card(value, cardtype))
-            if (value === 1 && cardtype === "Hearts") {
-                cardtype = "Spades"
-            } else if (value === 1 && cardtype === "Spades") {
-                cardtype = "Clubs"
-            } else if (value === 1 && cardtype === "Clubs") {
-                cardtype = "Diamonds"
-            }
-        }
-        return deck
-    }
+    // generate_deck() {
+    //     return new Deck()
+    // }
 
     update() {
         let status = {}
@@ -105,10 +94,7 @@ module.exports = class room {
     }
 
     pullOutRandomCardFromDeck() {
-        let random_val = Math.floor(Math.random() * this.deck.length)
-        let card = this.deck[random_val]
-        this.deck.splice(random_val, 1)
-        return card
+        return this.deck.pickCard()
     }
 
     disconnect(id) {

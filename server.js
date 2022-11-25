@@ -132,15 +132,20 @@ game_io.on('connection', (socket) => {
     })
 
     socket.on('fetchdeck', () => {
+        console.log("Fetch deck")
         const room = room_manager.find_room(socket.id)
         let user = room_manager.find_user(socket.id)
-        let random_val = Math.floor(Math.random() * room.deck.length)
-        user.cards.push(room.deck[random_val])
-        room.deck.splice(random_val, 1)
-        random_val = Math.floor(Math.random() * room.deck.length)
-        user.cards.push(room.deck[random_val])
-        user.cards.splice(random_val, 1)
+        user.cards.push(room.deck.pickCard())
+        user.cards.push(room.deck.pickCard())
         user.updateCards = true
+        console.log(user.cards)
+        // let random_val = Math.floor(Math.random() * room.deck.length)
+        // user.cards.push(room.deck[random_val])
+        // room.deck.splice(random_val, 1)
+        // random_val = Math.floor(Math.random() * room.deck.length)
+        // user.cards.push(room.deck[random_val])
+        // user.cards.splice(random_val, 1)
+        // user.updateCards = true
     })
 })
 
