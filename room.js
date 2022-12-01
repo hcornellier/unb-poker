@@ -42,10 +42,6 @@ module.exports = class room {
         lastPlayer.nextPlayer = this.players.length - 1
     }
 
-    // generate_deck() {
-    //     return new Deck()
-    // }
-
     update() {
         let status = {}
         let ids = []

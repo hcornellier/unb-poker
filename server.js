@@ -138,7 +138,7 @@ game_io.on('connection', (socket) => {
         user.cards.push(room.deck.pickCard())
         user.cards.push(room.deck.pickCard())
         user.updateCards = true
-        console.log(user.cards)
+        console.log("Pick card")
         // let random_val = Math.floor(Math.random() * room.deck.length)
         // user.cards.push(room.deck[random_val])
         // room.deck.splice(random_val, 1)
