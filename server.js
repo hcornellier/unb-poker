@@ -1,15 +1,35 @@
-const express      = require('express');
-const app          = express();
-const http         = require('http').createServer(app);
-const io           = require('socket.io')(http);
+const express = require('express');
+const fs = require('fs');
+const bodyParser = require("body-parser");
+const options = {
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.cert'),
+};
+const app = express();
+var https = require('https').createServer(options, app)
+.listen(3000, function (req, res) {
+console.log("Server started at port 3000");
+});
+const io = require('socket.io')(https);
+//const port = process.env.PORT || 3000;
+
+
 const Lobby        = require('./lobby.js')
 const RoomManager  = require('./room_manager.js')
 const colors       = require('colors');
 
-app.use(express.static('/images'))
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.use(express.static('images'));
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/menu.html')
-})
+    res.sendFile(__dirname + '/menu.html');
+    });
+
+
+
+//===================================================
+
 
 let username = "default"
 let room_code = ""
@@ -153,11 +173,20 @@ setInterval(() => {
     room_manager.update()
 }, 30)
 
-
+/*
 const port = process.env.PORT || 3000;
-http.listen(port, () => {
+https.listen(port, () => {
     console.log("\nServer is running!".red)
 })
+
+
+https.createServer(options, (req, res) => {
+    }).listen(port, () => {
+        console.log("\nServer is running!".red)
+    })
+
+*/
+
 
 function sendMessageToAllPlayers(room, msg) {
     room.players.forEach(p => {
