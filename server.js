@@ -59,25 +59,6 @@ login_io.on('connection', async(socket) => {
             socket.emit('login_validation', validate, message)
             console.log(users)
         })
-        // socket.on('registration', (username, password, repeatedPassword) => {
-        //     let validate = 0
-        //     let message = ""
-        //     console.log("\n# Creating user".yellow)
-        //     if (password !== repeatedPassword){
-        //         message = "Passwords must match"
-        //         reject(message)
-        //     }
-        //     else if (users.get(username) !== null){
-        //         message = "User with that username already registered"
-        //         reject(message)
-        //     }
-        //     else {
-        //         let saltValue = utils.generateSalt
-        //         let newUser = new user(username, utils.hashEncodePassword(password, saltValue), saltValue)
-        //         users.push(newUser)
-        //     }
-        //     socket.emit("registration_validation", validate, message)
-        // })
         resolve(message)
     })
     mode = await login
