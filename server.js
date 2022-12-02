@@ -37,6 +37,82 @@ app.get('/private/:room_code/:username', (req, res) => {
     room_code = req.params.room_code
 })
 
+var login_io = io.of('/login')
+login_io.on('connection', async(socket) => {
+    let validate = 0
+    let message = ""
+    let login = new Promise((resolve, reject) => {
+        socket.on('login', (username, password) => {
+            let validate = 0
+            let message = ""
+            let user = utils.lookForUser(users, username);
+
+            console.log("\n# Attempting login".yellow)
+            if (user != null && utils.validatePassword(password, user.salt, user.password)){
+                validate = 1
+                activeUsers.add(user)
+            }
+            else {
+                message = "Wrong username or password"
+                reject(message)
+            }
+            socket.emit('login_validation', validate, message)
+            console.log(users)
+        })
+        // socket.on('registration', (username, password, repeatedPassword) => {
+        //     let validate = 0
+        //     let message = ""
+        //     console.log("\n# Creating user".yellow)
+        //     if (password !== repeatedPassword){
+        //         message = "Passwords must match"
+        //         reject(message)
+        //     }
+        //     else if (users.get(username) !== null){
+        //         message = "User with that username already registered"
+        //         reject(message)
+        //     }
+        //     else {
+        //         let saltValue = utils.generateSalt
+        //         let newUser = new user(username, utils.hashEncodePassword(password, saltValue), saltValue)
+        //         users.push(newUser)
+        //     }
+        //     socket.emit("registration_validation", validate, message)
+        // })
+        resolve(message)
+    })
+    mode = await login
+})
+
+var registration_io = io.of('/register')
+registration_io.on('connection', async(socket) => {
+    let validate = 0
+    let message = ""
+    let registration = new Promise((resolve, reject) => {
+        socket.on('registration', (username, password, repeatedPassword) => {
+            let validate = 0
+            let message = ""
+            console.log("\n# Creating user".yellow)
+            if (password !== repeatedPassword){
+                message = "Passwords must match"
+                reject(message)
+            }
+            else if (utils.lookForUser(users, username) !== null){
+                message = "User with that username already registered"
+                reject(message)
+            }
+            else {
+                let saltValue = utils.generateSalt()
+                let newUser = new user(username, utils.hashEncodePassword(password, saltValue), saltValue)
+                users.push(newUser)
+            }
+            socket.emit("registration_validation", validate, message)
+        })
+        console.log(users)
+        resolve(message)
+    })
+    mode = await registration
+})
+
 var menu_io = io.of('/menu')
 menu_io.on('connection', async(socket) => {
     console.log("\n" + socket.id.cyan + " joined menu")
@@ -76,42 +152,6 @@ menu_io.on('connection', async(socket) => {
                 console.log("# Error joining room.".blue)
             }
             socket.emit('join_validation', validate, message)
-        })
-        socket.on('login', (username, password) => {
-            let validate = 0
-            let message = ""
-            let user = utils.lookForUser(users, username);
-
-            console.log("\n# Attempting login".yellow)
-            if (user != null && utils.validatePassword(password, user.salt, user.password)){
-                validate = 1
-                activeUsers.add(user)
-            }
-            else {
-                message = "Wrong username or password"
-                reject(message)
-            }
-            socket.emit('login_validation', validate, message)
-
-        })
-        socket.on('registration', (username, password, repeatedPassword) => {
-            let validate = 0
-            let message = ""
-            console.log("\n# Creating user".yellow)
-            if (password !== repeatedPassword){
-                message = "Passwords must match"
-                reject(message)
-            }
-            else if (users.get(username) !== null){
-                message = "User with that username already registered"
-                reject(message)
-            }
-            else {
-                let saltValue = utils.generateSalt
-                let newUser = new user(username, utils.hashEncodePassword(password, saltValue), saltValue)
-                users.push(newUser)
-            }
-            socket.emit("registration_validation", validate, message)
         })
         resolve(message)
     })

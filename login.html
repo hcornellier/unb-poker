@@ -42,7 +42,7 @@
         }
 
         function register(){
-            window.location.href = 'register/'
+            window.location.href = 'register'
         }
 
         function login()
@@ -63,7 +63,7 @@
             socket.emit('login', username, password);
             socket.on('login_validation', (validate, message) => {
                 if (validate == 1){
-                    window.location.href = 'lobby/';
+                    window.location.href = 'lobby';
                 }
                 else {
                     alert(message);
@@ -142,6 +142,6 @@
         <img src="" id="logo">
         <br/><br/>
         <p>Not what you're looking for?</p>
-        <button onclick="registration();">Register</button>
+        <button onclick="register();">Register</button>
     </div>
 </body>
