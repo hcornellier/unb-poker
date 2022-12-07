@@ -69,70 +69,14 @@
             socket.emit('registration', username, password, repeatPassword);
             socket.on("registration_validation", (validate, message) => {
                 if (validate == 1){
-                    window.location.href = 'lobby/';
+                    window.location.href = 'lobby';
                 }
                 else {
                     alert(message);
                     return;
                 }
             });
-
-            // let username = document.getElementById("username").value;
-            // if (username == null || username == "") {
-            //     alert("Enter your username")
-            //     return;
-            // }
-
-            // let room_code = window.prompt("Enter the room code to create", "");
-            // if (room_code == null || room_code == "") {
-            //     alert("Room code is empty");
-            //     return;
-            // }
-            // if (room_code === "public") {
-            //     alert("You cannot use that name as room code");
-            //     return;
-            // }
-
-            // socket.emit('create_private', username, room_code)
-            // socket.on('create_validation', (validate, message) => {
-            //     if (validate == 1) {
-            //         window.location.href = 'private/' + room_code + '/' + username;
-            //     } else {
-            //         alert(message);
-            //         return;
-            //     }
-            // });
         }
-
-        // function join_private()
-        // {
-        //     let username = document.getElementById("username").value;
-        //     if (username == null || username == "") {
-        //         alert("Enter your username")
-        //         return;
-        //     }
-
-        //     let room_code = window.prompt("Enter the room code to join", "");
-        //     if (room_code == null || room_code == "") {
-        //         alert("Room code is empty");
-        //         return;
-        //     }
-
-        //     if (room_code === "public") {
-        //         alert("You cannot use that name as room code");
-        //         return;
-        //     }
-
-        //     socket.emit('join_private', username ,room_code);
-        //     socket.on('join_validation', (validate, message) => {
-        //         if (validate == true)
-        //             window.location.href = 'private/' + room_code + '/' + username;
-        //         else {
-        //             alert(message);
-        //             return;
-        //         }
-        //     })
-        // }
 
     </script>
 

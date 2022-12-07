@@ -6,7 +6,7 @@ const Lobby        = require('./lobby.js')
 const RoomManager  = require('./room_manager.js')
 const colors       = require('colors');
 const utils        = require('./util.js');
-const user         = require('./user.js');
+const User         = require('./user.js');
 
 app.use(express.static('/images'))
 app.get('/', (req, res) => {
@@ -27,7 +27,7 @@ let room_code = ""
 let room_codes = {}
 let mode = "public"
 let testSalt = utils.generateSalt();
-let users = [new user("pete", utils.hashEncodePassword("test", testSalt), testSalt)];
+let users = [new User("pete", utils.hashEncodePassword("test", testSalt), testSalt)];
 // let users = utils.getUserData()
 let activeUsers = []
 
@@ -48,9 +48,10 @@ login_io.on('connection', async(socket) => {
             let user = utils.lookForUser(users, username);
 
             console.log("\n# Attempting login".yellow)
-            if (user != null && utils.validatePassword(password, user.salt, user.password)){
+            if (user !== null && utils.validatePassword(password, user.getSalt(), user.getPassword())){
                 validate = 1
-                activeUsers.add(user)
+                activeUsers.push(user)
+                console.log("Valid")
             }
             else {
                 message = "Wrong username or password"
@@ -83,8 +84,10 @@ registration_io.on('connection', async(socket) => {
             }
             else {
                 let saltValue = utils.generateSalt()
-                let newUser = new user(username, utils.hashEncodePassword(password, saltValue), saltValue)
+                let newUser = new User(username, utils.hashEncodePassword(password, saltValue), saltValue)
+                activeUsers.push(newUser)
                 users.push(newUser)
+                message = "Registration successful"
             }
             socket.emit("registration_validation", validate, message)
         })
@@ -94,7 +97,7 @@ registration_io.on('connection', async(socket) => {
     mode = await registration
 })
 
-var menu_io = io.of('/menu')
+var menu_io = io.of('/lobby')
 menu_io.on('connection', async(socket) => {
     console.log("\n" + socket.id.cyan + " joined menu")
     let validate = 0

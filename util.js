@@ -1,7 +1,7 @@
 var crypto = require('crypto');
 var jsonFile = './users.json';
 var fs = require('fs');
-// const user = require('./user');
+const User = require('./user');
 
 function generateSalt(){
     return crypto.randomBytes(24).toString('base64');
@@ -47,10 +47,10 @@ function saveUserData(users){
     }))
 }
 
-function lookForUser(userList, username){
-    for (user in userList){
-        if (user.username === username) {
-            return user;
+function lookForUser(userList, usrname){
+    for (i = 0; i < userList.length; i++){
+        if (userList[i].getUsername() === usrname) {
+            return userList[i];
         }
     }
     return null;
