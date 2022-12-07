@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"></meta>
+    <title>Lobby</title>
+    <style>
+        .center-contents {
+            text-align: center;
+        }
+        #logo {
+            padding-top : 200px;
+        }
+        h1 {
+            font-size: 100px;
+            padding-top: 50px;
+            padding-bottom: 50;
+        }
+    </style>
+</head>
+</html>
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('/register');
+        function join_public()
+        {
+            let username = document.getElementById("username").value;
+            if (username == null || username == "") {
+                alert("Enter your username");
+                return;
+            }
+
+            socket.emit('join_public', username)
+            socket.on('public_validation', (validate, message) => {
+                if (validate == 1)
+                    window.location.href = 'public/' + username;
+                else {
+                    alert(message);
+                    return;
+                }
+            });
+        }
+
+        function login(){
+            window.location.href = 'login'
+        }
+
+        function registration()
+        {
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            let repeatPassword = document.getElementById("repeatPassword").value;
+
+            if (username == null || username == "") {
+                alert("Enter your username");
+                return;
+            }
+
+            if (password == null || password == "") {
+                alert("Enter your password");
+                return;
+            }
+
+            if (repeatPassword == null || repeatPassword === "" || repeatPassword !== password) {
+                alert("passwords must match");
+                return;
+            }
+
+            socket.emit('registration', username, password, repeatPassword);
+            socket.on("registration_validation", (validate, message) => {
+                if (validate == 1){
+                    window.location.href = 'lobby';
+                }
+                else {
+                    alert(message);
+                    return;
+                }
+            });
+        }
+
+    </script>
+
+    <div class="center-contents">
+        <h1>UNB Poker</h1><br/><br/>
+        <h3>Registration</h3>
+        <div class="username_input">
+            <input class="inputbox" id="username" name="username" type="text" placeholder="username">
+            <input class="inputbox" id="password" name="password" type="password" placeholder="password">
+            <input class="inputbox" id="repeatPassword" name="repeatPassword" type="password" placeholder="repeat password">
+        </div>
+        <button onclick="registration();">Register</button>
+        <!-- <button onclick="join_private();">Join Private Game</button> -->
+        <img src="" id="logo">
+        <br/><br/>
+        <p>Not what you're looking for?</p>
+        <button onclick="login();">Login</button>
+    </div>
+</body>

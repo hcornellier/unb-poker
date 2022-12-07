@@ -17,14 +17,25 @@ const io = require('socket.io')(https);
 const Lobby        = require('./lobby.js')
 const RoomManager  = require('./room_manager.js')
 const colors       = require('colors');
+const utils        = require('./util.js');
+const User         = require('./user.js');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(express.static('images'));
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/menu.html');
-    });
+    res.sendFile(__dirname + '/login.html')
+})
+app.get('/login', (req, res) => {
+    res.sendFile(__dirname + '/login.html')
+})
+app.get('/register', (req, res) => {
+    res.sendFile(__dirname + '/registration.html')
+})
+app.get('/lobby', (req, res) => {
+    res.sendFile(__dirname + '/menu.html')
+})
 
 
 
@@ -35,6 +46,10 @@ let username = "default"
 let room_code = ""
 let room_codes = {}
 let mode = "public"
+let testSalt = utils.generateSalt();
+let users = [new User("pete", utils.hashEncodePassword("test", testSalt), testSalt)];
+// let users = utils.getUserData()
+let activeUsers = []
 
 app.get('/private/:room_code/:username', (req, res) => {
     res.sendFile(__dirname + '/game.html')
@@ -42,7 +57,67 @@ app.get('/private/:room_code/:username', (req, res) => {
     room_code = req.params.room_code
 })
 
-var menu_io = io.of('/menu')
+var login_io = io.of('/login')
+login_io.on('connection', async(socket) => {
+    let validate = 0
+    let message = ""
+    let login = new Promise((resolve, reject) => {
+        socket.on('login', (username, password) => {
+            let validate = 0
+            let message = ""
+            let user = utils.lookForUser(users, username);
+
+            console.log("\n# Attempting login".yellow)
+            if (user !== null && utils.validatePassword(password, user.getSalt(), user.getPassword())){
+                validate = 1
+                activeUsers.push(user)
+                console.log("Valid")
+            }
+            else {
+                message = "Wrong username or password"
+                reject(message)
+            }
+            socket.emit('login_validation', validate, message)
+            console.log(users)
+        })
+        resolve(message)
+    })
+    mode = await login
+})
+
+var registration_io = io.of('/register')
+registration_io.on('connection', async(socket) => {
+    let validate = 0
+    let message = ""
+    let registration = new Promise((resolve, reject) => {
+        socket.on('registration', (username, password, repeatedPassword) => {
+            let validate = 0
+            let message = ""
+            console.log("\n# Creating user".yellow)
+            if (password !== repeatedPassword){
+                message = "Passwords must match"
+                reject(message)
+            }
+            else if (utils.lookForUser(users, username) !== null){
+                message = "User with that username already registered"
+                reject(message)
+            }
+            else {
+                let saltValue = utils.generateSalt()
+                let newUser = new User(username, utils.hashEncodePassword(password, saltValue), saltValue)
+                activeUsers.push(newUser)
+                users.push(newUser)
+                message = "Registration successful"
+            }
+            socket.emit("registration_validation", validate, message)
+        })
+        console.log(users)
+        resolve(message)
+    })
+    mode = await registration
+})
+
+var menu_io = io.of('/lobby')
 menu_io.on('connection', async(socket) => {
     console.log("\n" + socket.id.cyan + " joined menu")
     let validate = 0
